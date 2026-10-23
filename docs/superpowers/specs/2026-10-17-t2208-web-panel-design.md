@@ -1,6 +1,6 @@
 # T2208 Web Control Panel — Design Spec
 
-- **Status:** Written spec approved by the user on 2026-10-17; implementation plan in progress.
+- **Status:** Written spec approved by the user on 2026-10-23; implementation plan in progress.
 - **Date:** 2026-10-17
 - **Project path:** `C:\Users\Angelo\Projects\T2208-web-panel`
 - **Target:** T2208 digital mixer/controller represented by the supplied Android APK and Windows EXE.
@@ -95,4 +95,4 @@ Real-control acceptance is separate and requires a physical T2208, matching firm
 
 ## 10. Approval state
 
-The user approved the direction, responsive priority, module grouping, local-bridge approach, safety model, and written spec on 2026-10-17. The implementation plan is now being prepared; no product code has been created.
+The user approved the direction, responsive priority, module grouping, local-bridge approach, safety model, and written spec on 2026-10-23. The implementation plan is now being prepared; no product code has been created.
