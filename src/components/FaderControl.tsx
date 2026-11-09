@@ -1,4 +1,5 @@
 import { useId } from 'react';
+import { faderToDb } from '../domain/format';
 
 interface FaderControlProps {
   value: number;
@@ -35,7 +36,7 @@ export function FaderControl({
         value={value}
         disabled={disabled}
         aria-label={label}
-        aria-valuetext={`${value}`}
+        aria-valuetext={faderToDb(value)}
         onChange={(event) => onChange(Number(event.target.value))}
       />
     </div>
