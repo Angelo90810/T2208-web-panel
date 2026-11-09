@@ -214,6 +214,11 @@ dd {
   transform: translateY(1px);
 }
 
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .btn-primary {
   background: linear-gradient(180deg, #ffb63d, var(--accent));
   border-color: #c88617;

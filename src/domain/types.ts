@@ -41,6 +41,7 @@ export interface GateState {
 
 export interface CompressorState {
   enabled: boolean;
+  limiter: boolean;
   threshold: number;
   attack: number;
   release: number;

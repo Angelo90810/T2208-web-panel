@@ -95,6 +95,7 @@ export function AppShell() {
               type="button"
               className={`nav-item${view === item.id ? ' is-active' : ''}`}
               aria-current={view === item.id ? 'page' : undefined}
+              title={t(item.labelKey)}
               onClick={() => setView(item.id)}
             >
               <Icon name={item.icon} size={19} />

@@ -117,7 +117,7 @@ function makeStrip(spec: StripSpec, auxCount: number, fxCount: number): ChannelS
     eq: defaultEq(),
     geq: [...DEFAULT_GEQ],
     gate: { enabled: false, threshold: -60, attack: 10, release: 200 },
-    comp: { enabled: false, threshold: -20, attack: 20, release: 200, ratio: 3, gain: 0 },
+    comp: { enabled: false, limiter: false, threshold: -20, attack: 20, release: 200, ratio: 3, gain: 0 },
     fx: { enabled: false, type: 'Hall', params: { 'Pre Delay': 20, Decay: 2.4, Size: 50, 'Hi Damp': 6, Mix: 30 } },
     sends,
     prePost,

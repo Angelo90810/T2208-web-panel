@@ -107,6 +107,8 @@ export function PresetsView() {
         <span className="tag">{t('presets.demoLibrary')}</span>
       </header>
 
+      <p className="hint">{t('presets.deviceNote')}</p>
+
       <div className="library-layout">
         <article className="panel">
           <header className="panel-head">

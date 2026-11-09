@@ -184,6 +184,22 @@ export function SystemView() {
 
         <article className="panel">
           <header className="panel-head">
+            <h2>{t('system.memory')}</h2>
+            <span className="tag">{t('system.windowsOnly')}</span>
+          </header>
+          <p className="hint">{t('system.memoryNote')}</p>
+          <div className="panel-actions">
+            <button type="button" className="btn btn-ghost" disabled>
+              {t('system.exportMemory')}
+            </button>
+            <button type="button" className="btn btn-ghost" disabled>
+              {t('system.importMemory')}
+            </button>
+          </div>
+        </article>
+
+        <article className="panel">
+          <header className="panel-head">
             <h2>{t('system.channelNames')}</h2>
             <span className="tag">{snapshot.strips.length}</span>
           </header>
@@ -218,6 +234,7 @@ export function SystemView() {
             </button>
           </div>
         </article>
+
       </div>
 
       <ConfirmDialog

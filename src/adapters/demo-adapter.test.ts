@@ -78,6 +78,21 @@ describe('DemoAdapter', () => {
     expect(adapter.getSnapshot().strips.find((strip) => strip.id === 'ch-17-18')?.phantom).toBe(false);
   });
 
+  it('toggles the simulated limiter independently of the compressor', async () => {
+    const adapter = new DemoAdapter({ storage: memoryStorage() });
+    const result = await adapter.dispatch({
+      type: 'processing.set',
+      stripId: 'ch-1',
+      section: 'compressor',
+      controlKey: 'limiter',
+      value: true,
+    });
+
+    expect(result.ok).toBe(true);
+    expect(adapter.getSnapshot().strips[0].comp.limiter).toBe(true);
+    expect(adapter.getSnapshot().strips[0].comp.enabled).toBe(false);
+  });
+
   it('usesSeedWhenStoredLibraryIsAbsent', () => {
     const adapter = new DemoAdapter({ storage: memoryStorage() });
     expect(adapter.getSnapshot().library.presets.length).toBeGreaterThan(0);

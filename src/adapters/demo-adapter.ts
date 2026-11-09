@@ -483,6 +483,7 @@ export class DemoAdapter implements MixerAdapter {
 
     if (section === 'compressor') {
       if (controlKey === 'enabled') return { ok: true, strip: { ...strip, comp: { ...strip.comp, enabled: Boolean(value) } } };
+      if (controlKey === 'limiter') return { ok: true, strip: { ...strip, comp: { ...strip.comp, limiter: Boolean(value) } } };
       if (!isNumber(value)) return { ok: false, simulated: true, code: 'invalid' };
       if (controlKey === 'threshold') return { ok: true, strip: { ...strip, comp: { ...strip.comp, threshold: clamp(value, -60, 0) } } };
       if (controlKey === 'attack') return { ok: true, strip: { ...strip, comp: { ...strip.comp, attack: clamp(value, 0, 100) } } };

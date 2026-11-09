@@ -150,4 +150,15 @@ describe('App', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Mixer' })).toBeInTheDocument();
     expect(screen.getByText('DEMO — no mixer connected')).toBeInTheDocument();
   });
+
+  it('keeps Windows-only memory actions disabled in the browser', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await openView(user, 'Sistema');
+
+    expect(screen.getByRole('button', { name: 'Exportar memória' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Importar memória' })).toBeDisabled();
+    expect(screen.getByText('Somente Windows')).toBeInTheDocument();
+  });
 });

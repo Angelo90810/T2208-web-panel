@@ -70,15 +70,26 @@ export function CompressorPanel({ strip }: { strip: ChannelState }) {
     <div className="panel">
       <header className="panel-head">
         <h2>{t('processing.compressor')}</h2>
-        <div className="inline-toggle">
-          <span>{t('common.enabled')}</span>
-          <Toggle
-            label={`${t('processing.compressor')} ${t('common.enabled')}`}
-            checked={strip.comp.enabled}
-            onChange={(value) => set('enabled', value)}
-          />
+        <div className="panel-head-toggles">
+          <div className="inline-toggle">
+            <span>{t('processing.limiter')}</span>
+            <Toggle
+              label={`${t('processing.limiter')} ${strip.name}`}
+              checked={strip.comp.limiter}
+              onChange={(value) => set('limiter', value)}
+            />
+          </div>
+          <div className="inline-toggle">
+            <span>{t('common.enabled')}</span>
+            <Toggle
+              label={`${t('processing.compressor')} ${t('common.enabled')}`}
+              checked={strip.comp.enabled}
+              onChange={(value) => set('enabled', value)}
+            />
+          </div>
         </div>
       </header>
+      <p className="hint">{t('processing.limiterHint')}</p>
       <div className="slider-grid">
         <SliderField
           label={t('processing.threshold')}

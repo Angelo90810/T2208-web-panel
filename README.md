@@ -2,17 +2,17 @@
 
 Painel web responsivo para o mixer **T2208**, construído a partir da análise estática do APK Android e do aplicativo Windows oficiais. Esta primeira fase é **100% DEMO**: a interface inteira funciona, mas nenhum comando é enviado a uma mesa real.
 
-![status](https://img.shields.io/badge/fase-DEMO-f6a623) ![stack](https://img.shields.io/badge/React-19-4cc9f0) ![testes](https://img.shields.io/badge/testes-16%20passando-34d399)
+![status](https://img.shields.io/badge/fase-DEMO-f6a623) ![stack](https://img.shields.io/badge/React-19-4cc9f0) ![testes](https://img.shields.io/badge/testes-18%20passando-34d399)
 
 ## O que já funciona
 
 - **Mixer** — 30 strips (20 entradas, USB, 8 Aux, 2 FX e Main), 6 grupos DCA, fader, mute, solo, ganho, pan, nomes e seleção por banco ou salto direto de canal.
 - **Medidores e RTA** — medidores por canal e espectro FFT simulado.
-- **Processamento** — PEQ de 4 bandas + HPF/LPF, GEQ de 31 bandas, gate, compressor, FX, delay e 48V com confirmação.
+- **Processamento** — PEQ de 4 bandas + HPF/LPF, GEQ de 31 bandas, gate, compressor/limiter, FX, delay e 48V com confirmação.
 - **Routing** — envios Aux/FX, pré/pós, grupos DCA, I/O digital e matriz de saída.
 - **AutoMix** — ativação, participação por canal e limpeza com confirmação.
 - **Presets e cenas** — biblioteca local no navegador, salvar, carregar, copiar, excluir e recall com confirmação.
-- **Sistema** — identidade, idioma (pt-BR/en/zh-CN), brilho, página inicial, atalho, IP e restauração de padrões.
+- **Sistema** — identidade, idioma (pt-BR/en/zh-CN), brilho, página inicial, atalho, IP, restauração de padrões e placeholders de memória (Windows-only).
 - **Conexão** — estados simulados de descoberta e conexão, validação de IPv4 e explicação do protocolo observado.
 
 ## Segurança e limites desta fase
@@ -28,7 +28,7 @@ Painel web responsivo para o mixer **T2208**, construído a partir da análise e
 ```bash
 npm install
 npm run dev        # http://127.0.0.1:5173
-npm run test:run   # 16 testes
+npm run test:run   # 18 testes
 npm run typecheck
 npm run build      # gera dist/
 ```

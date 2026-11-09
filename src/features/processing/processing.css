@@ -44,6 +44,13 @@
   font-size: 0.8rem;
 }
 
+.panel-head-toggles {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
 .slider-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
