@@ -28,12 +28,12 @@ describe('App', () => {
     const user = userEvent.setup();
     render(<App />);
 
-    expect(screen.getByText('DEMO — nenhuma mesa conectada')).toBeInTheDocument();
+    expect(screen.getByText('DEMO — nenhuma mesa conectada.')).toBeInTheDocument();
 
     for (const view of VIEWS) {
       await openView(user, view.nav);
       expect(screen.getByRole('heading', { level: 1, name: view.heading })).toBeInTheDocument();
-      expect(screen.getByText('DEMO — nenhuma mesa conectada')).toBeInTheDocument();
+      expect(screen.getByText('DEMO — nenhuma mesa conectada.')).toBeInTheDocument();
     }
   });
 
@@ -148,7 +148,7 @@ describe('App', () => {
     await user.selectOptions(screen.getByRole('combobox', { name: 'Idioma' }), 'en');
 
     expect(screen.getByRole('heading', { level: 1, name: 'Mixer' })).toBeInTheDocument();
-    expect(screen.getByText('DEMO — no mixer connected')).toBeInTheDocument();
+    expect(screen.getByText('DEMO — no mixer connected.')).toBeInTheDocument();
   });
 
   it('keeps Windows-only memory actions disabled in the browser', async () => {

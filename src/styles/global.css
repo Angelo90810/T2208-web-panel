@@ -324,6 +324,11 @@ input[type='range'] {
   background: transparent;
 }
 
+input[type='range']:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 input[type='range']::-webkit-slider-runnable-track {
   background: linear-gradient(180deg, #1c2a3b, #0e1620);
   border-radius: 999px;
