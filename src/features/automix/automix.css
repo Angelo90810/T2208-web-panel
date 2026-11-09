@@ -1,0 +1,77 @@
+.automix-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.automix-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.automix-status strong {
+  color: var(--text);
+}
+
+.automix-status.is-active {
+  border-color: rgba(52, 211, 153, 0.35);
+}
+
+.automix-status.is-active .activity-dot {
+  background: var(--green);
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.7);
+}
+
+.automix-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.automix-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  background: var(--panel);
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+}
+
+.automix-card.is-participating {
+  border-color: rgba(246, 166, 35, 0.4);
+  background: rgba(246, 166, 35, 0.04);
+}
+
+.automix-card header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  text-align: center;
+}
+
+.automix-card header strong {
+  font-size: 0.78rem;
+}
+
+.automix-card .meter {
+  height: 90px;
+}
+
+.automix-card-foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 0.66rem;
+}

@@ -1,0 +1,95 @@
+.send-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.send-row {
+  display: grid;
+  grid-template-columns: 74px minmax(90px, 1fr) 42px auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.send-row:last-child {
+  border-bottom: 0;
+}
+
+.send-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.send-row output {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+  text-align: right;
+}
+
+.panel-toggle {
+  margin-top: 12px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.dca-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dca-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+}
+
+.dca-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dca-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.digital-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.digital-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  background: #0b111a;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+
+.digital-state {
+  color: var(--yellow);
+  font-size: 0.58rem;
+}
+
+@media (max-width: 700px) {
+  .send-row {
+    grid-template-columns: 62px 1fr 34px;
+  }
+
+  .send-row .segmented {
+    grid-column: 2 / 4;
+    justify-self: start;
+  }
+}
