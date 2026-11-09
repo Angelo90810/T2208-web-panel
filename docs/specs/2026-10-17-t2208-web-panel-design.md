@@ -105,4 +105,8 @@ Real-control acceptance is separate and requires a physical T2208, matching firm
 
 ## 10. Approval state
 
-The user approved the direction, responsive priority, module grouping, local-bridge approach, safety model, and written spec on 2026-10-23. The implementation plan is now being prepared; no product code has been created.
+The user approved the direction, responsive priority, module grouping, local-bridge approach, safety model, and written spec on 2026-10-23.
+
+Phase 1 (DEMO) was implemented on 2026-11-09 in commits `bc0a885` (`feat: build responsive T2208 demo panel`) and `b5e51fd` (`feat: add limiter, memory placeholders and tablet layout`). The app covers all nine functional areas above, keeps the DEMO banner on every view, persists presets/scenes only in browser storage, and passes 18 automated tests plus `tsc --noEmit` and a production build. Desktop (1440×900), tablet (1024×768) and phone (390×844) layouts were exercised in a real browser.
+
+Real hardware control, discovery, and the local bridge remain pending; they require a physical T2208 and firmware/protocol validation, as described in §6 and §9.
