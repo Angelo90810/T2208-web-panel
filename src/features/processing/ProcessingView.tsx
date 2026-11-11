@@ -30,6 +30,9 @@ export function ProcessingView() {
   const [tab, setTab] = useState<Tab>('peq');
   const strip =
     snapshot.strips.find((item) => item.id === snapshot.selectedStripId) ?? snapshot.strips[0];
+  const geqAvailable = strip.kind === 'main' || strip.kind === 'aux';
+  const tabs = TABS.filter((item) => item.id !== 'geq' || geqAvailable);
+  const activeTab = tab === 'geq' && !geqAvailable ? 'peq' : tab;
 
   return (
     <section className="view processing-view">
@@ -46,13 +49,13 @@ export function ProcessingView() {
       </header>
 
       <div className="tabs" role="tablist" aria-label={t('processing.title')}>
-        {TABS.map((item) => (
+        {tabs.map((item) => (
           <button
             key={item.id}
             type="button"
             role="tab"
-            aria-selected={tab === item.id}
-            className={`tab${tab === item.id ? ' is-active' : ''}`}
+            aria-selected={activeTab === item.id}
+            className={`tab${activeTab === item.id ? ' is-active' : ''}`}
             onClick={() => setTab(item.id)}
           >
             {t(item.labelKey)}
@@ -61,13 +64,13 @@ export function ProcessingView() {
       </div>
 
       <div className="tab-panel" role="tabpanel">
-        {tab === 'peq' && <PeqPanel strip={strip} />}
-        {tab === 'geq' && <GeqPanel strip={strip} />}
-        {tab === 'gate' && <GatePanel strip={strip} />}
-        {tab === 'compressor' && <CompressorPanel strip={strip} />}
-        {tab === 'fx' && <FxPanel strip={strip} />}
-        {tab === 'delay' && <DelayPanel strip={strip} />}
-        {tab === 'phantom' && <PhantomPowerControl strip={strip} />}
+        {activeTab === 'peq' && <PeqPanel strip={strip} />}
+        {activeTab === 'geq' && <GeqPanel strip={strip} />}
+        {activeTab === 'gate' && <GatePanel strip={strip} />}
+        {activeTab === 'compressor' && <CompressorPanel strip={strip} />}
+        {activeTab === 'fx' && <FxPanel strip={strip} />}
+        {activeTab === 'delay' && <DelayPanel strip={strip} />}
+        {activeTab === 'phantom' && <PhantomPowerControl strip={strip} />}
       </div>
     </section>
   );

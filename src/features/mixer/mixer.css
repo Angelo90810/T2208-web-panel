@@ -254,6 +254,29 @@
   margin-bottom: 8px;
 }
 
+.copy-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.copy-row select {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+  background: #0f1722;
+  color: var(--text);
+  font: inherit;
+}
+
+.copy-row .btn {
+  padding: 6px 10px;
+  white-space: nowrap;
+}
+
 .dca-checks {
   display: flex;
   flex-wrap: wrap;

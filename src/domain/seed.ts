@@ -116,13 +116,14 @@ function makeStrip(spec: StripSpec, auxCount: number, fxCount: number): ChannelS
     eqEnabled: isInput,
     eq: defaultEq(),
     geq: [...DEFAULT_GEQ],
-    gate: { enabled: false, threshold: -60, attack: 10, release: 200 },
-    comp: { enabled: false, limiter: false, threshold: -20, attack: 20, release: 200, ratio: 3, gain: 0 },
-    fx: { enabled: false, type: 'Hall', params: { 'Pre Delay': 20, Decay: 2.4, Size: 50, 'Hi Damp': 6, Mix: 30 } },
+    gate: { enabled: false, threshold: -84, attack: 45, release: 350 },
+    comp: { enabled: false, threshold: 20, attack: 70, release: 350, ratio: 4.5, gain: 0 },
+    fx: { enabled: false, type: 'Hall', params: { 'Pre Delay': 20, Decay: 2.4, 'Room Size': 50, 'Hi Damp': 6, 'Efx Out': 50, 'Dry Out': 50 } },
     sends,
     prePost,
     mainAssign: isInput,
     dcaGroups: [],
+    linked: false,
     automix: false,
     meter: isInput ? 0.32 + (spec.index % 4) * 0.05 : spec.kind === 'main' ? 0.42 : 0.18,
   };
@@ -158,14 +159,14 @@ function makeLibrary(strips: ChannelState[], buses: BusState[], dcaGroups: DcaGr
     presets: [
       {
         id: 'preset-demo-banda',
-        name: 'Demo — Banda',
+        name: 'Banda',
         kind: 'preset',
         createdAt: now,
         snapshot,
       },
       {
         id: 'preset-demo-vocal',
-        name: 'Demo — Vocal',
+        name: 'Vocal',
         kind: 'preset',
         createdAt: now,
         snapshot,
@@ -218,6 +219,36 @@ export function buildSeedSnapshot(capabilities: DeviceCapabilities = DEFAULT_CAP
     },
     outputMatrix: {},
     selectedStripId: strips[0]?.id ?? 'main',
+  };
+}
+
+/**
+ * A bridge-only snapshot used before the mixer is connected or before its
+ * state is read. It deliberately contains no strips: the UI must show the
+ * connection screen instead of fabricating a mixer.
+ */
+export function buildEmptySnapshot(capabilities: DeviceCapabilities = DEFAULT_CAPABILITIES): MixerSnapshot {
+  return {
+    mode: 'bridge',
+    connection: 'bridge-unavailable',
+    capabilities: { ...capabilities },
+    strips: [],
+    buses: [],
+    dcaGroups: [],
+    autoMix: { active: false, channels: {} },
+    library: { presets: [], scenes: [] },
+    system: {
+      deviceName: 'T2208',
+      deviceId: '',
+      brightness: 80,
+      defaultPage: 'connection',
+      language: 'pt-BR',
+      ip: '',
+      shortcut: 'none',
+      firmware: '',
+    },
+    outputMatrix: {},
+    selectedStripId: '',
   };
 }
 

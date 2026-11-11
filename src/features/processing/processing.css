@@ -44,6 +44,24 @@
   font-size: 0.8rem;
 }
 
+.peq-type {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.peq-type select {
+  padding: 4px 6px;
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+  background: #0f1722;
+  color: var(--text);
+  font: inherit;
+}
+
 .panel-head-toggles {
   display: flex;
   align-items: center;

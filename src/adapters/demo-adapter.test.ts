@@ -78,19 +78,46 @@ describe('DemoAdapter', () => {
     expect(adapter.getSnapshot().strips.find((strip) => strip.id === 'ch-17-18')?.phantom).toBe(false);
   });
 
-  it('toggles the simulated limiter independently of the compressor', async () => {
+  it('links and unlinks a fixed channel pair', async () => {
     const adapter = new DemoAdapter({ storage: memoryStorage() });
-    const result = await adapter.dispatch({
-      type: 'processing.set',
+    const before = adapter.getSnapshot().strips.find((strip) => strip.id === 'ch-2')?.gain;
+    const linked = await adapter.dispatch({
+      type: 'strip.set',
       stripId: 'ch-1',
-      section: 'compressor',
-      controlKey: 'limiter',
+      control: 'link',
       value: true,
     });
+    expect(linked.ok).toBe(true);
+    expect(adapter.getSnapshot().strips.find((strip) => strip.id === 'ch-2')?.linked).toBe(true);
 
+    await adapter.dispatch({ type: 'strip.set', stripId: 'ch-1', control: 'link', value: false });
+    expect(adapter.getSnapshot().strips.find((strip) => strip.id === 'ch-2')?.gain).toBe(before);
+  });
+
+  it('renames a DCA group', async () => {
+    const adapter = new DemoAdapter({ storage: memoryStorage() });
+    const result = await adapter.dispatch({
+      type: 'dca.rename',
+      dcaGroupId: 'dca-1',
+      name: 'Drums',
+    });
     expect(result.ok).toBe(true);
-    expect(adapter.getSnapshot().strips[0].comp.limiter).toBe(true);
-    expect(adapter.getSnapshot().strips[0].comp.enabled).toBe(false);
+    expect(adapter.getSnapshot().dcaGroups.find((group) => group.id === 'dca-1')?.name).toBe('Drums');
+  });
+
+  it('copies the manual DSP fields to another channel', async () => {
+    const adapter = new DemoAdapter({ storage: memoryStorage() });
+    await adapter.dispatch({
+      type: 'processing.set',
+      stripId: 'ch-1',
+      section: 'peq',
+      controlKey: 'band1.gain',
+      value: 6,
+    });
+    const result = await adapter.dispatch({ type: 'strip.copy', fromId: 'ch-1', toId: 'ch-3' });
+    expect(result.ok).toBe(true);
+    expect(adapter.getSnapshot().strips.find((strip) => strip.id === 'ch-3')?.eq.find((band) => band.id === 'band1')?.gain).toBe(6);
+    expect(adapter.getSnapshot().strips.find((strip) => strip.id === 'ch-3')?.name).toBe('Canal 3');
   });
 
   it('usesSeedWhenStoredLibraryIsAbsent', () => {

@@ -1,32 +1,29 @@
 # T2208 Web Panel
 
-Painel web responsivo para o mixer **T2208**, construído a partir da análise estática do APK Android e do aplicativo Windows oficiais. A interface está completa em modo **DEMO**, e a **ponte local** já existe e roda contra um simulador — a validação com a mesa física continua pendente.
+Painel web responsivo para o mixer **T2208**, construído a partir do manual oficial e da análise estática do APK Android e do aplicativo Windows. O painel é **somente ponte**: sem a mesa conectada ele mostra a tela de conexão, não um mixer simulado. A validação de escrita com a mesa física continua pendente.
 
-![status](https://img.shields.io/badge/fase-DEMO-f6a623) ![bridge](https://img.shields.io/badge/ponte-dry--run-4cc9f0) ![testes](https://img.shields.io/badge/testes-27%20passando-34d399)
+![status](https://img.shields.io/badge/fase-ponte%20local-4cc9f0) ![bridge](https://img.shields.io/badge/ponte-dry--run-f6a623) ![testes](https://img.shields.io/badge/testes-29%20passando-34d399)
 
 ## O que já funciona
 
 - **Mixer** — 30 strips (20 entradas, USB, 8 Aux, 2 FX e Main), 6 grupos DCA, fader, mute, solo, ganho, pan, nomes e seleção por banco ou salto direto de canal.
-- **Medidores e RTA** — medidores por canal e espectro FFT simulado.
-- **Processamento** — PEQ de 4 bandas + HPF/LPF, GEQ de 31 bandas, gate, compressor/limiter, FX, delay e 48V com confirmação.
+- **Medidores e RTA** — medidores por canal e espectro FFT.
+- **Processamento** — PEQ de 4 bandas + HPF/LPF, GEQ de 31 bandas, gate, compressor, 12 tipos de FX, delay de até 300 ms e 48V com confirmação.
 - **Routing** — envios Aux/FX, pré/pós, grupos DCA, I/O digital e matriz de saída.
 - **AutoMix** — ativação, participação por canal e limpeza com confirmação.
 - **Presets e cenas** — biblioteca local no navegador, salvar, carregar, copiar, excluir e recall com confirmação.
 - **Sistema** — identidade, idioma (pt-BR/en/zh-CN), brilho, página inicial, atalho, IP, restauração de padrões e placeholders de memória (Windows-only).
-- **Conexão** — cenários demo e **modo ponte**: descoberta UDP real, TCP 5000, leitura de versão/nome e dry-run.
+- **Conexão** — descoberta UDP real, TCP 5000, leitura de versão/nome e dry-run. Sem ponte, as demais telas ficam bloqueadas.
 - **Ponte local** — codec do quadro, mapa de comandos 1–55, descoberta HF-A11/IP120, cliente TCP, servidor HTTP/WS e simulador T2208.
 
-## Modos
+## Modo
 
-| Modo | Como entrar | O que acontece |
-|---|---|---|
-| **DEMO** | padrão, sem parâmetro | estado simulado no navegador; banner DEMO |
-| **Ponte** | `?bridge=ws://127.0.0.1:8787/ws` ou Conexão → Usar ponte | painel usa o snapshot da ponte; banner PONTE LOCAL e dry-run |
+O painel tem um único modo de produção: **ponte local**. A URL pode vir de `?bridge=ws://127.0.0.1:8787/ws` ou da tela **Conexão → Usar ponte**. Sem ponte, o painel mostra apenas a tela de conexão e mantém as outras funções desabilitadas. O `DemoAdapter` existe somente para testes automatizados e para o estado interno da ponte; ele não é selecionável na interface.
 
 ## Segurança e limites
 
-- No modo DEMO, toda tela mantém o banner **DEMO** e o estado `demo-*`; nenhum socket é aberto pelo navegador.
-- No modo ponte, o banner é **PONTE LOCAL — mesa não validada**; a ponte lê versão/nome e mantém **dry-run**.
+- O banner é **PONTE LOCAL — mesa não validada**; a ponte lê versão/nome e mantém **dry-run**.
+- Sem conexão, o painel não inventa strips nem estado da mesa.
 - A ponte ainda **não envia comandos de controle** (ganho, fader, 48V, routing etc.) porque os payloads não foram validados no hardware. `--allow-real-writes` é reservado e ignorado.
 - 48V/phantom power, reset, exclusão de preset, recall de cena e limpeza do AutoMix exigem confirmação explícita; cancelar não altera o estado.
 - O perfil de 30 strips/6 DCA/48V nos 16 primeiros vem da análise estática e ainda **não foi validado em hardware**.
@@ -37,7 +34,7 @@ Painel web responsivo para o mixer **T2208**, construído a partir da análise e
 ```bash
 npm install
 npm run dev          # http://127.0.0.1:5173
-npm run test:run     # 27 testes
+npm run test:run     # 29 testes
 npm run typecheck
 npm run typecheck:bridge
 npm run build        # gera dist/
@@ -65,10 +62,10 @@ A descoberta também pode ser feita pela tela **Conexão → Ponte local → Pro
 
 ```
 src/
-  adapters/       MixerAdapter, DemoAdapter e BridgeAdapter
+  adapters/       MixerAdapter, BridgeAdapter e DemoAdapter (testes/estado interno)
   app/            provider, i18n, navegação, shell e seleção de modo
   components/     controles e feedback reutilizáveis
-  domain/         tipos, capacidades, constantes e seed do perfil demo
+  domain/         tipos, capacidades, constantes e seed do estado local
   features/       uma pasta por tela (mixer, meters, processing, routing, ...)
   i18n/           catálogo pt-BR/en/zh-CN
   styles/         tokens e CSS global
@@ -91,6 +88,7 @@ Com a mesa no local: validar o handshake, a resposta de versão, os ACKs e a cod
 ## Referências
 
 - `docs/research/2026-11-09-t2208-protocol-analysis.md` — portas, quadro, mapa de comandos e modelo de canais recuperados estaticamente.
+- `docs/research/2026-11-11-manual-parity.md` — comparação manual × APK × EXE × painel, com o que foi corrigido e o que falta.
 - `docs/specs/2026-10-17-t2208-web-panel-design.md` — decisões de produto e escopo da fase 1.
 - `docs/specs/2026-11-11-local-bridge-phase.md` — escopo e status da ponte local.
 - `bridge/README.md` — API, execução e limites da ponte.

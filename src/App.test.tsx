@@ -1,6 +1,7 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { DemoAdapter } from './adapters/demo-adapter';
 import App from './App';
 
 const VIEWS = [
@@ -19,6 +20,10 @@ async function openView(user: ReturnType<typeof userEvent.setup>, name: string) 
   await user.click(within(nav).getByRole('button', { name }));
 }
 
+function renderApp() {
+  return render(<App adapter={new DemoAdapter()} />);
+}
+
 beforeEach(() => {
   window.localStorage.clear();
 });
@@ -26,7 +31,7 @@ beforeEach(() => {
 describe('App', () => {
   it('keeps the demo banner visible and reaches every view', async () => {
     const user = userEvent.setup();
-    render(<App />);
+    renderApp();
 
     expect(screen.getByText('DEMO — nenhuma mesa conectada.')).toBeInTheDocument();
 
@@ -39,7 +44,7 @@ describe('App', () => {
 
   it('requires confirmation before enabling 48V and cancel keeps it off', async () => {
     const user = userEvent.setup();
-    render(<App />);
+    renderApp();
 
     await openView(user, 'Processamento');
     await user.click(screen.getByRole('tab', { name: '48V' }));
@@ -69,7 +74,7 @@ describe('App', () => {
 
   it('does not offer 48V on a stereo pair', async () => {
     const user = userEvent.setup();
-    render(<App />);
+    renderApp();
 
     await user.selectOptions(
       screen.getByRole('combobox', { name: 'Ir para canal' }),
@@ -84,7 +89,7 @@ describe('App', () => {
 
   it('cancels a scene recall without removing the scene', async () => {
     const user = userEvent.setup();
-    render(<App />);
+    renderApp();
 
     await openView(user, 'Presets');
     await user.click(screen.getByRole('button', { name: 'Recall' }));
@@ -99,24 +104,24 @@ describe('App', () => {
 
   it('cancels preset deletion and only removes it after confirmation', async () => {
     const user = userEvent.setup();
-    render(<App />);
+    renderApp();
 
     await openView(user, 'Presets');
     await user.click(screen.getAllByRole('button', { name: 'Excluir' })[0]);
 
     let dialog = screen.getByRole('dialog');
     await user.click(within(dialog).getByRole('button', { name: 'Cancelar' }));
-    expect(screen.getByText('Demo — Banda')).toBeInTheDocument();
+    expect(screen.getByText('Banda')).toBeInTheDocument();
 
     await user.click(screen.getAllByRole('button', { name: 'Excluir' })[0]);
     dialog = screen.getByRole('dialog');
     await user.click(within(dialog).getByRole('button', { name: 'Excluir' }));
-    expect(screen.queryByText('Demo — Banda')).not.toBeInTheDocument();
+    expect(screen.queryByText('Banda')).not.toBeInTheDocument();
   });
 
   it('keeps AutoMix participation when clearing is cancelled', async () => {
     const user = userEvent.setup();
-    render(<App />);
+    renderApp();
 
     await openView(user, 'AutoMix');
     await user.click(screen.getByRole('switch', { name: 'Participação Canal 1' }));
@@ -143,7 +148,7 @@ describe('App', () => {
 
   it('switches the interface language without leaving demo mode', async () => {
     const user = userEvent.setup();
-    render(<App />);
+    renderApp();
 
     await user.selectOptions(screen.getByRole('combobox', { name: 'Idioma' }), 'en');
 
@@ -153,7 +158,7 @@ describe('App', () => {
 
   it('keeps Windows-only memory actions disabled in the browser', async () => {
     const user = userEvent.setup();
-    render(<App />);
+    renderApp();
 
     await openView(user, 'Sistema');
 

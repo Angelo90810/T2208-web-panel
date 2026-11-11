@@ -4,7 +4,25 @@ import { useI18n } from '../../app/useI18n';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { SliderField } from '../../components/SliderField';
 import { Toggle } from '../../components/Toggle';
-import { FX_PARAMETERS, FX_TYPES } from '../../domain/constants';
+import {
+  COMP_ATTACK_MAX,
+  COMP_ATTACK_MIN,
+  COMP_RATIO_MAX,
+  COMP_RATIO_MIN,
+  COMP_RELEASE_MAX,
+  COMP_RELEASE_MIN,
+  COMP_THRESHOLD_MAX,
+  COMP_THRESHOLD_MIN,
+  DELAY_MAX_MS,
+  FX_PARAMETERS,
+  FX_TYPES,
+  GATE_ATTACK_MAX,
+  GATE_ATTACK_MIN,
+  GATE_RELEASE_MAX,
+  GATE_RELEASE_MIN,
+  GATE_THRESHOLD_MAX,
+  GATE_THRESHOLD_MIN,
+} from '../../domain/constants';
 import type { ChannelState } from '../../domain/types';
 
 function useProcessingDispatch(strip: ChannelState, section: 'gate' | 'compressor' | 'fx' | 'delay') {
@@ -35,24 +53,24 @@ export function GatePanel({ strip }: { strip: ChannelState }) {
         <SliderField
           label={t('processing.threshold')}
           value={strip.gate.threshold}
-          min={-80}
-          max={0}
+          min={GATE_THRESHOLD_MIN}
+          max={GATE_THRESHOLD_MAX}
           unit=" dB"
           onChange={(value) => set('threshold', value)}
         />
         <SliderField
           label={t('processing.attack')}
           value={strip.gate.attack}
-          min={0}
-          max={100}
+          min={GATE_ATTACK_MIN}
+          max={GATE_ATTACK_MAX}
           unit=" ms"
           onChange={(value) => set('attack', value)}
         />
         <SliderField
           label={t('processing.release')}
           value={strip.gate.release}
-          min={0}
-          max={1000}
+          min={GATE_RELEASE_MIN}
+          max={GATE_RELEASE_MAX}
           step={10}
           unit=" ms"
           onChange={(value) => set('release', value)}
@@ -70,48 +88,37 @@ export function CompressorPanel({ strip }: { strip: ChannelState }) {
     <div className="panel">
       <header className="panel-head">
         <h2>{t('processing.compressor')}</h2>
-        <div className="panel-head-toggles">
-          <div className="inline-toggle">
-            <span>{t('processing.limiter')}</span>
-            <Toggle
-              label={`${t('processing.limiter')} ${strip.name}`}
-              checked={strip.comp.limiter}
-              onChange={(value) => set('limiter', value)}
-            />
-          </div>
-          <div className="inline-toggle">
-            <span>{t('common.enabled')}</span>
-            <Toggle
-              label={`${t('processing.compressor')} ${t('common.enabled')}`}
-              checked={strip.comp.enabled}
-              onChange={(value) => set('enabled', value)}
-            />
-          </div>
+        <div className="inline-toggle">
+          <span>{t('common.enabled')}</span>
+          <Toggle
+            label={`${t('processing.compressor')} ${t('common.enabled')}`}
+            checked={strip.comp.enabled}
+            onChange={(value) => set('enabled', value)}
+          />
         </div>
       </header>
-      <p className="hint">{t('processing.limiterHint')}</p>
       <div className="slider-grid">
         <SliderField
           label={t('processing.threshold')}
           value={strip.comp.threshold}
-          min={-60}
-          max={0}
+          min={COMP_THRESHOLD_MIN}
+          max={COMP_THRESHOLD_MAX}
           unit=" dB"
           onChange={(value) => set('threshold', value)}
         />
         <SliderField
           label={t('processing.attack')}
           value={strip.comp.attack}
-          min={0}
-          max={100}
+          min={COMP_ATTACK_MIN}
+          max={COMP_ATTACK_MAX}
           unit=" ms"
           onChange={(value) => set('attack', value)}
         />
         <SliderField
           label={t('processing.release')}
           value={strip.comp.release}
-          min={0}
-          max={1000}
+          min={COMP_RELEASE_MIN}
+          max={COMP_RELEASE_MAX}
           step={10}
           unit=" ms"
           onChange={(value) => set('release', value)}
@@ -119,8 +126,8 @@ export function CompressorPanel({ strip }: { strip: ChannelState }) {
         <SliderField
           label={t('processing.ratio')}
           value={strip.comp.ratio}
-          min={1}
-          max={20}
+          min={COMP_RATIO_MIN}
+          max={COMP_RATIO_MAX}
           step={0.5}
           unit=":1"
           onChange={(value) => set('ratio', value)}
@@ -207,7 +214,7 @@ export function DelayPanel({ strip }: { strip: ChannelState }) {
         label={t('processing.delay')}
         value={strip.delayMs}
         min={0}
-        max={500}
+        max={DELAY_MAX_MS}
         unit=" ms"
         disabled={!strip.delayEnabled}
         onChange={(value) => set('ms', value)}

@@ -2,13 +2,14 @@ import { useMixer } from '../../app/MixerProvider';
 import { useI18n } from '../../app/useI18n';
 import { SliderField } from '../../components/SliderField';
 import { Toggle } from '../../components/Toggle';
+import { PEQ_GAIN_MAX, PEQ_GAIN_MIN, PEQ_Q_MAX, PEQ_Q_MIN } from '../../domain/constants';
 import type { ChannelState } from '../../domain/types';
 
 export function PeqPanel({ strip }: { strip: ChannelState }) {
   const { dispatch } = useMixer();
   const { t } = useI18n();
 
-  const setBand = (bandId: string, field: string, value: number | boolean) => {
+  const setBand = (bandId: string, field: string, value: number | boolean | string) => {
     void dispatch({
       type: 'processing.set',
       stripId: strip.id,
@@ -59,6 +60,19 @@ export function PeqPanel({ strip }: { strip: ChannelState }) {
                   onChange={(value) => setBand(band.id, 'enabled', value)}
                 />
               </header>
+              {bandNumber && (
+                <label className="peq-type">
+                  <span>{t('processing.type')}</span>
+                  <select
+                    value={band.type}
+                    onChange={(event) => setBand(band.id, 'type', event.target.value)}
+                  >
+                    <option value="peq">PEQ</option>
+                    <option value="hpf">HPF</option>
+                    <option value="lpf">LPF</option>
+                  </select>
+                </label>
+              )}
               <SliderField
                 label={t('processing.freq')}
                 value={band.freq}
@@ -72,8 +86,8 @@ export function PeqPanel({ strip }: { strip: ChannelState }) {
                 <SliderField
                   label={t('processing.gain')}
                   value={band.gain}
-                  min={-15}
-                  max={15}
+                  min={PEQ_GAIN_MIN}
+                  max={PEQ_GAIN_MAX}
                   step={0.5}
                   unit=" dB"
                   onChange={(value) => setBand(band.id, 'gain', value)}
@@ -82,8 +96,8 @@ export function PeqPanel({ strip }: { strip: ChannelState }) {
               <SliderField
                 label={t('processing.q')}
                 value={band.q}
-                min={0.1}
-                max={10}
+                min={PEQ_Q_MIN}
+                max={PEQ_Q_MAX}
                 step={0.1}
                 onChange={(value) => setBand(band.id, 'q', value)}
               />

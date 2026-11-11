@@ -140,6 +140,16 @@
   color: var(--text);
 }
 
+.nav-item:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.nav-item:disabled:hover {
+  background: transparent;
+  color: var(--muted);
+}
+
 .nav-item.is-active {
   background: rgba(246, 166, 35, 0.1);
   border-color: rgba(246, 166, 35, 0.28);

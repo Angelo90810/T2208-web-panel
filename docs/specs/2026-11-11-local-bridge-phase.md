@@ -7,27 +7,27 @@
 
 ## 1. Why
 
-The Phase 1 panel is a DEMO. The mixer lives at the church, so the next useful step is the local bridge and the whole transport path, tested against a simulator. Control payloads cannot be considered validated until the physical T2208 is available.
+The Phase 1 panel was a DEMO. On 2026-11-11 the demo path was removed from production: the panel is now bridge-only and shows a connection screen when the bridge is unavailable. The mixer lives at the church, so the transport path is tested against a simulator. Control payloads cannot be considered validated until the physical T2208 is available.
 
 ## 2. Architecture
 
 ```
 Browser SPA (React)
-  ├─ DemoAdapter (localStorage, default)
-  └─ BridgeAdapter (WebSocket/HTTP)
+  └─ BridgeAdapter (WebSocket/HTTP, default)
+       └─ DemoAdapter (tests and bridge-local state only)
           │
           ▼
 Local bridge (Node/TypeScript)
   ├─ BridgeEngine (snapshot + status)
   ├─ TcpDeviceClient (TCP 5000, safe probes)
   ├─ discovery (UDP 48899 / 5005→8000)
-  └─ T2208Simulator (tests and demo mode)
+  └─ T2208Simulator (tests and bridge simulation)
 ```
 
 - The bridge owns the device socket; the browser never opens UDP/TCP directly.
 - The bridge exposes `GET /health`, `GET /status`, `GET /state`, `POST /discover`, `POST /connect`, `POST /disconnect`, `POST /action`, and `WS /ws`.
-- `BridgeAdapter` implements the same `MixerAdapter` as `DemoAdapter`; views do not know which one is active.
-- Mode is selected by `?bridge=<ws-url>` or the `t2208-bridge-url` localStorage key; without it the panel stays in DEMO.
+- `BridgeAdapter` implements the same `MixerAdapter` as `DemoAdapter`; views do not know which one is active. `DemoAdapter` is not selectable in production.
+- The bridge URL is selected by `?bridge=<ws-url>` or the `t2208-bridge-url` localStorage key; without a reachable bridge the panel shows only the connection screen.
 
 ## 3. Protocol implementation
 
@@ -49,7 +49,7 @@ Local bridge (Node/TypeScript)
 ## 5. Acceptance
 
 - `npm run typecheck` and `npm run typecheck:bridge` pass.
-- `npm run test:run` passes: existing 18 tests + 9 bridge tests.
+- `npm run test:run` passes: 29 tests (8 UI + 12 adapter + 9 bridge).
 - `npm run build` succeeds.
 - `npm run bridge:sim` starts TCP 5000 + UDP 48899/8000; `/health` reports `bridge-connected`, version `V1.1`, name `T2208-SIM`.
 - `POST /discover` finds the simulator through both UDP paths.

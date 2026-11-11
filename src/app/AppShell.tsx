@@ -47,6 +47,8 @@ export function AppShell() {
   const [view, setView] = useState<ViewId>(() =>
     isViewId(snapshot.system.defaultPage) ? snapshot.system.defaultPage : 'mixer',
   );
+  const hasDevice = snapshot.strips.length > 0;
+  const activeView: ViewId = hasDevice ? view : 'connection';
 
   return (
     <div className="app-shell">
@@ -94,9 +96,10 @@ export function AppShell() {
             <button
               key={item.id}
               type="button"
-              className={`nav-item${view === item.id ? ' is-active' : ''}`}
-              aria-current={view === item.id ? 'page' : undefined}
+              className={`nav-item${activeView === item.id ? ' is-active' : ''}`}
+              aria-current={activeView === item.id ? 'page' : undefined}
               title={t(item.labelKey)}
+              disabled={!hasDevice && item.id !== 'connection'}
               onClick={() => setView(item.id)}
             >
               <Icon name={item.icon} size={19} />
@@ -106,13 +109,26 @@ export function AppShell() {
         </nav>
 
         <main className="app-main" id="main">
-          {renderView(view)}
+          {renderView(activeView)}
         </main>
       </div>
 
       <footer className="app-footer">
-        <span className="footer-badge">{t('demo.short')}</span>
-        <span>{t('demo.detail')}</span>
+        {snapshot.mode === 'demo' ? (
+          <>
+            <span className="footer-badge">{t('demo.short')}</span>
+            <span>{t('demo.detail')}</span>
+          </>
+        ) : (
+          <>
+            <span className="footer-badge">PONTE</span>
+            <span>
+              {snapshot.bridge?.deviceHost
+                ? `${t('bridge.deviceHost')}: ${snapshot.bridge.deviceHost}`
+                : t('bridge.notConfigured')}
+            </span>
+          </>
+        )}
       </footer>
     </div>
   );

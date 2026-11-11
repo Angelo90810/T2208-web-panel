@@ -1,5 +1,6 @@
 import { useMixer } from '../../app/MixerProvider';
 import { useI18n } from '../../app/useI18n';
+import { GEQ_MAX, GEQ_MIN } from '../../domain/constants';
 import type { ChannelState } from '../../domain/types';
 
 const LABELS: Record<number, string> = {
@@ -30,8 +31,8 @@ export function GeqPanel({ strip }: { strip: ChannelState }) {
             <input
               className="geq-slider"
               type="range"
-              min={-12}
-              max={12}
+              min={GEQ_MIN}
+              max={GEQ_MAX}
               step={1}
               value={gain}
               aria-label={`${t('processing.band', { index: index + 1 })}`}

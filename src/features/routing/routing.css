@@ -52,6 +52,25 @@
   gap: 10px;
 }
 
+.dca-name-input {
+  min-width: 0;
+  width: 96px;
+  padding: 4px 6px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+}
+
+.dca-name-input:hover,
+.dca-name-input:focus {
+  border-color: var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  outline: none;
+}
+
 .dca-actions {
   display: flex;
   align-items: center;

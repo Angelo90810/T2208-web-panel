@@ -1,4 +1,29 @@
-import { DEFAULT_CAPABILITIES, FX_TYPES, LIBRARY_STORAGE_KEY } from '../domain/constants';
+import {
+  COMP_ATTACK_MAX,
+  COMP_ATTACK_MIN,
+  COMP_RATIO_MAX,
+  COMP_RATIO_MIN,
+  COMP_RELEASE_MAX,
+  COMP_RELEASE_MIN,
+  COMP_THRESHOLD_MAX,
+  COMP_THRESHOLD_MIN,
+  DEFAULT_CAPABILITIES,
+  DELAY_MAX_MS,
+  FX_TYPES,
+  GATE_ATTACK_MAX,
+  GATE_ATTACK_MIN,
+  GATE_RELEASE_MAX,
+  GATE_RELEASE_MIN,
+  GATE_THRESHOLD_MAX,
+  GATE_THRESHOLD_MIN,
+  GEQ_MAX,
+  GEQ_MIN,
+  LIBRARY_STORAGE_KEY,
+  PEQ_GAIN_MAX,
+  PEQ_GAIN_MIN,
+  PEQ_Q_MAX,
+  PEQ_Q_MIN,
+} from '../domain/constants';
 import { buildSeedSnapshot, parseLibrary } from '../domain/seed';
 import type {
   ChannelState,
@@ -73,6 +98,7 @@ export class DemoAdapter implements MixerAdapter {
   private snapshot: MixerSnapshot;
   private readonly listeners = new Set<(snapshot: MixerSnapshot) => void>();
   private readonly storage: StorageLike;
+  private readonly linkBackups = new Map<string, ChannelState>();
 
   constructor(options: DemoAdapterOptions = {}) {
     this.storage = options.storage ?? defaultStorage();
@@ -122,6 +148,68 @@ export class DemoAdapter implements MixerAdapter {
     return true;
   }
 
+  private setLink(stripId: string, linked: boolean): boolean {
+    const source = this.snapshot.strips.find((strip) => strip.id === stripId);
+    if (!source) return false;
+
+    const pairIndex = source.kind === 'mono'
+      ? source.index % 2 === 1 ? source.index + 1 : source.index - 1
+      : source.kind === 'aux'
+        ? (source.index - 20) % 2 === 1 ? source.index + 1 : source.index - 1
+        : -1;
+    const pair = this.snapshot.strips.find(
+      (strip) => strip.kind === source.kind && strip.index === pairIndex,
+    );
+    if (!pair) return false;
+
+    if (!linked) {
+      const backup = this.linkBackups.get(pair.id);
+      this.snapshot = {
+        ...this.snapshot,
+        strips: this.snapshot.strips.map((strip) => {
+          if (strip.id === source.id) return { ...strip, linked: false };
+          if (strip.id === pair.id) return backup ? { ...backup, linked: false } : { ...strip, linked: false };
+          return strip;
+        }),
+      };
+      this.linkBackups.delete(pair.id);
+      return true;
+    }
+
+    this.linkBackups.set(pair.id, { ...pair });
+    const copied: ChannelState = {
+      ...pair,
+      gain: source.gain,
+      fader: source.fader,
+      mute: source.mute,
+      solo: source.solo,
+      pan: source.pan,
+      polarity: source.polarity,
+      delayEnabled: source.delayEnabled,
+      delayMs: source.delayMs,
+      eqEnabled: source.eqEnabled,
+      eq: source.eq.map((band) => ({ ...band })),
+      geq: [...source.geq],
+      gate: { ...source.gate },
+      comp: { ...source.comp },
+      fx: { ...source.fx, params: { ...source.fx.params } },
+      sends: { ...source.sends },
+      prePost: { ...source.prePost },
+      mainAssign: source.mainAssign,
+      linked: true,
+    };
+
+    this.snapshot = {
+      ...this.snapshot,
+      strips: this.snapshot.strips.map((strip) => {
+        if (strip.id === source.id) return { ...strip, linked: true };
+        if (strip.id === pair.id) return copied;
+        return strip;
+      }),
+    };
+    return true;
+  }
+
   private apply(action: MixerAction): DispatchResult {
     switch (action.type) {
       case 'strip.select': {
@@ -144,7 +232,18 @@ export class DemoAdapter implements MixerAdapter {
         if (action.control === 'fader' && typeof value === 'number') value = clamp(value, 0, 100);
         if (action.control === 'gain' && typeof value === 'number') value = clamp(value, -60, 10);
         if (action.control === 'pan' && typeof value === 'number') value = clamp(value, -100, 100);
-        if (action.control === 'delayMs' && typeof value === 'number') value = clamp(value, 0, 500);
+        if (action.control === 'delayMs' && typeof value === 'number') value = clamp(value, 0, DELAY_MAX_MS);
+        if (action.control === 'link') {
+          if (typeof value !== 'boolean') {
+            return { ok: false, simulated: true, code: 'invalid', message: 'Valor inválido.' };
+          }
+          return this.setLink(action.stripId, value)
+            ? { ok: true, simulated: true, code: 'applied' }
+            : { ok: false, simulated: true, code: 'not-supported', message: 'Canal sem par de link.' };
+        }
+        if (action.control === 'mainAssign' && (target.kind === 'aux' || target.kind === 'main')) {
+          return { ok: false, simulated: true, code: 'not-supported', message: 'Este canal não vai para o Main.' };
+        }
         if (action.control === 'phantom48v') {
           if (target.kind !== 'mono' || target.index > this.snapshot.capabilities.phantomChannelCount) {
             return { ok: false, simulated: true, code: 'not-supported', message: '48V indisponível neste canal.' };
@@ -195,6 +294,31 @@ export class DemoAdapter implements MixerAdapter {
         const inputLabel = action.inputLabel.trim().slice(0, 16);
         if (!inputLabel) return { ok: false, simulated: true, code: 'invalid', message: 'Entrada vazia.' };
         return this.updateStrip(action.stripId, (strip) => ({ ...strip, inputLabel }))
+          ? { ok: true, simulated: true, code: 'applied' }
+          : { ok: false, simulated: true, code: 'invalid' };
+      }
+
+      case 'strip.copy': {
+        const from = this.snapshot.strips.find((strip) => strip.id === action.fromId);
+        const to = this.snapshot.strips.find((strip) => strip.id === action.toId);
+        if (!from || !to || from.id === to.id) {
+          return { ok: false, simulated: true, code: 'invalid', message: 'Origem/destino inválidos.' };
+        }
+        const updated = this.updateStrip(to.id, (target) => ({
+          ...target,
+          polarity: from.polarity,
+          gain: from.gain,
+          delayEnabled: from.delayEnabled,
+          delayMs: from.delayMs,
+          gate: { ...from.gate },
+          comp: { ...from.comp },
+          eqEnabled: from.eqEnabled,
+          eq: from.eq.map((band) => ({ ...band })),
+          sends: { ...from.sends },
+          prePost: { ...from.prePost },
+          mainAssign: from.mainAssign,
+        }));
+        return updated
           ? { ok: true, simulated: true, code: 'applied' }
           : { ok: false, simulated: true, code: 'invalid' };
       }
@@ -270,6 +394,20 @@ export class DemoAdapter implements MixerAdapter {
                   ...(action.control === 'solo' ? { solo: Boolean(action.value) } : {}),
                 }
               : group,
+          ),
+        };
+        return { ok: true, simulated: true, code: 'applied' };
+      }
+
+      case 'dca.rename': {
+        const name = action.name.trim().slice(0, 8);
+        if (!name) return { ok: false, simulated: true, code: 'invalid', message: 'Nome vazio.' };
+        const exists = this.snapshot.dcaGroups.some((item) => item.id === action.dcaGroupId);
+        if (!exists) return { ok: false, simulated: true, code: 'invalid', message: 'DCA inválido.' };
+        this.snapshot = {
+          ...this.snapshot,
+          dcaGroups: this.snapshot.dcaGroups.map((group) =>
+            group.id === action.dcaGroupId ? { ...group, name } : group,
           ),
         };
         return { ok: true, simulated: true, code: 'applied' };
@@ -465,9 +603,12 @@ export class DemoAdapter implements MixerAdapter {
       const eq = strip.eq.map((item) => {
         if (item.id !== bandId) return item;
         if (field === 'enabled') return { ...item, enabled: Boolean(value) };
+        if (field === 'type' && typeof value === 'string' && ['peq', 'hpf', 'lpf'].includes(value)) {
+          return { ...item, type: value as typeof item.type };
+        }
         if (field === 'freq' && isNumber(value)) return { ...item, freq: clamp(value, 20, 20000) };
-        if (field === 'gain' && isNumber(value)) return { ...item, gain: clamp(value, -15, 15) };
-        if (field === 'q' && isNumber(value)) return { ...item, q: clamp(value, 0.1, 10) };
+        if (field === 'gain' && isNumber(value)) return { ...item, gain: clamp(value, PEQ_GAIN_MIN, PEQ_GAIN_MAX) };
+        if (field === 'q' && isNumber(value)) return { ...item, q: clamp(value, PEQ_Q_MIN, PEQ_Q_MAX) };
         return item;
       });
       return { ok: true, strip: { ...strip, eq } };
@@ -478,27 +619,26 @@ export class DemoAdapter implements MixerAdapter {
       if (!Number.isInteger(index) || index < 0 || index >= strip.geq.length || !isNumber(value)) {
         return { ok: false, simulated: true, code: 'invalid', message: 'Banda GEQ inválida.' };
       }
-      const geq = strip.geq.map((gain, i) => (i === index ? clamp(value, -12, 12) : gain));
+      const geq = strip.geq.map((gain, i) => (i === index ? clamp(value, GEQ_MIN, GEQ_MAX) : gain));
       return { ok: true, strip: { ...strip, geq } };
     }
 
     if (section === 'gate') {
       if (controlKey === 'enabled') return { ok: true, strip: { ...strip, gate: { ...strip.gate, enabled: Boolean(value) } } };
       if (!isNumber(value)) return { ok: false, simulated: true, code: 'invalid' };
-      if (controlKey === 'threshold') return { ok: true, strip: { ...strip, gate: { ...strip.gate, threshold: clamp(value, -80, 0) } } };
-      if (controlKey === 'attack') return { ok: true, strip: { ...strip, gate: { ...strip.gate, attack: clamp(value, 0, 100) } } };
-      if (controlKey === 'release') return { ok: true, strip: { ...strip, gate: { ...strip.gate, release: clamp(value, 0, 1000) } } };
+      if (controlKey === 'threshold') return { ok: true, strip: { ...strip, gate: { ...strip.gate, threshold: clamp(value, GATE_THRESHOLD_MIN, GATE_THRESHOLD_MAX) } } };
+      if (controlKey === 'attack') return { ok: true, strip: { ...strip, gate: { ...strip.gate, attack: clamp(value, GATE_ATTACK_MIN, GATE_ATTACK_MAX) } } };
+      if (controlKey === 'release') return { ok: true, strip: { ...strip, gate: { ...strip.gate, release: clamp(value, GATE_RELEASE_MIN, GATE_RELEASE_MAX) } } };
       return { ok: false, simulated: true, code: 'invalid' };
     }
 
     if (section === 'compressor') {
       if (controlKey === 'enabled') return { ok: true, strip: { ...strip, comp: { ...strip.comp, enabled: Boolean(value) } } };
-      if (controlKey === 'limiter') return { ok: true, strip: { ...strip, comp: { ...strip.comp, limiter: Boolean(value) } } };
       if (!isNumber(value)) return { ok: false, simulated: true, code: 'invalid' };
-      if (controlKey === 'threshold') return { ok: true, strip: { ...strip, comp: { ...strip.comp, threshold: clamp(value, -60, 0) } } };
-      if (controlKey === 'attack') return { ok: true, strip: { ...strip, comp: { ...strip.comp, attack: clamp(value, 0, 100) } } };
-      if (controlKey === 'release') return { ok: true, strip: { ...strip, comp: { ...strip.comp, release: clamp(value, 0, 1000) } } };
-      if (controlKey === 'ratio') return { ok: true, strip: { ...strip, comp: { ...strip.comp, ratio: clamp(value, 1, 20) } } };
+      if (controlKey === 'threshold') return { ok: true, strip: { ...strip, comp: { ...strip.comp, threshold: clamp(value, COMP_THRESHOLD_MIN, COMP_THRESHOLD_MAX) } } };
+      if (controlKey === 'attack') return { ok: true, strip: { ...strip, comp: { ...strip.comp, attack: clamp(value, COMP_ATTACK_MIN, COMP_ATTACK_MAX) } } };
+      if (controlKey === 'release') return { ok: true, strip: { ...strip, comp: { ...strip.comp, release: clamp(value, COMP_RELEASE_MIN, COMP_RELEASE_MAX) } } };
+      if (controlKey === 'ratio') return { ok: true, strip: { ...strip, comp: { ...strip.comp, ratio: clamp(value, COMP_RATIO_MIN, COMP_RATIO_MAX) } } };
       if (controlKey === 'gain') return { ok: true, strip: { ...strip, comp: { ...strip.comp, gain: clamp(value, 0, 24) } } };
       return { ok: false, simulated: true, code: 'invalid' };
     }
@@ -521,7 +661,7 @@ export class DemoAdapter implements MixerAdapter {
     if (section === 'delay') {
       if (controlKey === 'enabled') return { ok: true, strip: { ...strip, delayEnabled: Boolean(value) } };
       if (controlKey === 'ms' && isNumber(value)) {
-        return { ok: true, strip: { ...strip, delayMs: clamp(value, 0, 500) } };
+        return { ok: true, strip: { ...strip, delayMs: clamp(value, 0, DELAY_MAX_MS) } };
       }
       return { ok: false, simulated: true, code: 'invalid' };
     }

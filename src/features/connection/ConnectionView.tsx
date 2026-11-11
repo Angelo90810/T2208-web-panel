@@ -91,12 +91,6 @@ export function ConnectionView() {
     window.location.assign(next.toString());
   };
 
-  const useDemoMode = () => {
-    window.localStorage.removeItem(BRIDGE_URL_STORAGE_KEY);
-    const next = new URL(window.location.href);
-    next.searchParams.delete('bridge');
-    window.location.assign(next.toString());
-  };
 
   const discoverBridge = async () => {
     if (discovering) return;
@@ -357,9 +351,7 @@ export function ConnectionView() {
               <button type="button" className="btn btn-primary" onClick={useBridgeMode}>
                 {t('bridge.use')}
               </button>
-              <button type="button" className="btn btn-ghost" onClick={useDemoMode}>
-                {t('bridge.useDemo')}
-              </button>
+
             </div>
             <div className="protocol-note">
               <Icon name="link" size={18} />

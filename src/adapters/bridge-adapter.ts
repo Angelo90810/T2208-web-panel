@@ -1,5 +1,5 @@
 import { DEFAULT_BRIDGE_URL } from '../domain/constants';
-import { buildSeedSnapshot } from '../domain/seed';
+import { buildEmptySnapshot } from '../domain/seed';
 import type {
   BridgeConnectionState,
   DispatchResult,
@@ -52,7 +52,7 @@ export class BridgeAdapter implements MixerAdapter {
 
   constructor(url = DEFAULT_BRIDGE_URL) {
     this.url = url;
-    const base = buildSeedSnapshot();
+    const base = buildEmptySnapshot();
     this.snapshot = {
       ...base,
       mode: 'bridge',

@@ -51,7 +51,6 @@ export interface GateState {
 
 export interface CompressorState {
   enabled: boolean;
-  limiter: boolean;
   threshold: number;
   attack: number;
   release: number;
@@ -90,6 +89,7 @@ export interface ChannelState {
   prePost: Record<string, 'pre' | 'post'>;
   mainAssign: boolean;
   dcaGroups: string[];
+  linked: boolean;
   automix: boolean;
   meter: number;
 }
@@ -185,7 +185,8 @@ export type StripControl =
   | 'phantom48v'
   | 'delayEnabled'
   | 'delayMs'
-  | 'mainAssign';
+  | 'mainAssign'
+  | 'link';
 
 export type ProcessingSection = 'peq' | 'geq' | 'gate' | 'compressor' | 'fx' | 'delay';
 
@@ -208,6 +209,7 @@ export type MixerAction =
     }
   | { type: 'strip.rename'; stripId: string; name: string }
   | { type: 'strip.map'; stripId: string; inputLabel: string }
+  | { type: 'strip.copy'; fromId: string; toId: string }
   | {
       type: 'processing.set';
       stripId: string;
@@ -229,6 +231,7 @@ export type MixerAction =
       enabled: boolean;
     }
   | { type: 'dca.assign'; stripId: string; dcaGroupId: string; assigned: boolean }
+  | { type: 'dca.rename'; dcaGroupId: string; name: string }
   | {
       type: 'dca.set';
       dcaGroupId: string;

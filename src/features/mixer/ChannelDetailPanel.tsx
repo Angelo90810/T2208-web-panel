@@ -4,6 +4,7 @@ import { useI18n } from '../../app/useI18n';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { SliderField } from '../../components/SliderField';
 import { Toggle } from '../../components/Toggle';
+import { DELAY_MAX_MS } from '../../domain/constants';
 import type { ChannelState } from '../../domain/types';
 
 const KIND_LABELS: Record<ChannelState['kind'], string> = {
@@ -19,7 +20,10 @@ export function ChannelDetailPanel({ strip }: { strip: ChannelState }) {
   const { snapshot, dispatch } = useMixer();
   const { t } = useI18n();
   const [phantomOpen, setPhantomOpen] = useState(false);
+  const [copyTarget, setCopyTarget] = useState('');
   const isInput = strip.kind === 'mono' || strip.kind === 'stereo' || strip.kind === 'usb';
+  const canMain = isInput || strip.kind === 'fx';
+  const linkable = strip.kind === 'mono' || strip.kind === 'aux';
   const canPhantom = strip.kind === 'mono' && strip.index <= snapshot.capabilities.phantomChannelCount;
 
   return (
@@ -68,7 +72,20 @@ export function ChannelDetailPanel({ strip }: { strip: ChannelState }) {
           />
         </div>
 
-        {isInput && (
+        {linkable && (
+          <div className="toggle-row">
+            <span>{t('mixer.link')}</span>
+            <Toggle
+              label={`${t('mixer.link')} ${strip.name}`}
+              checked={strip.linked}
+              onChange={(value) => {
+                void dispatch({ type: 'strip.set', stripId: strip.id, control: 'link', value });
+              }}
+            />
+          </div>
+        )}
+
+        {canMain && (
           <div className="toggle-row">
             <span>{t('mixer.mainAssign')}</span>
             <Toggle
@@ -117,7 +134,7 @@ export function ChannelDetailPanel({ strip }: { strip: ChannelState }) {
         label={t('mixer.delay')}
         value={strip.delayMs}
         min={0}
-        max={500}
+        max={DELAY_MAX_MS}
         step={1}
         unit=" ms"
         disabled={!strip.delayEnabled}
@@ -146,6 +163,39 @@ export function ChannelDetailPanel({ strip }: { strip: ChannelState }) {
               {group.name}
             </label>
           ))}
+        </div>
+      </div>
+
+      <div className="detail-section">
+        <h3>{t('mixer.copy')}</h3>
+        <p className="hint">{t('mixer.copyHint')}</p>
+        <div className="copy-row">
+          <select
+            aria-label={t('mixer.copyTo')}
+            value={copyTarget}
+            onChange={(event) => setCopyTarget(event.target.value)}
+          >
+            <option value="">{t('mixer.copyTo')}</option>
+            {snapshot.strips
+              .filter((item) => item.id !== strip.id)
+              .map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.inputLabel} · {item.name}
+                </option>
+              ))}
+          </select>
+          <button
+            type="button"
+            className="btn btn-ghost"
+            disabled={!copyTarget}
+            onClick={() => {
+              if (!copyTarget) return;
+              void dispatch({ type: 'strip.copy', fromId: strip.id, toId: copyTarget });
+              setCopyTarget('');
+            }}
+          >
+            {t('mixer.copyAction')}
+          </button>
         </div>
       </div>
 

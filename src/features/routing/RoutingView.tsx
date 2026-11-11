@@ -150,7 +150,19 @@ export function RoutingView() {
               return (
                 <article className="panel dca-card" key={group.id}>
                   <header className="panel-head">
-                    <h2>{group.name}</h2>
+                    <input
+                      className="dca-name-input"
+                      value={group.name}
+                      maxLength={8}
+                      aria-label={`${t('dca.name')} ${group.name}`}
+                      onChange={(event) => {
+                        void dispatch({
+                          type: 'dca.rename',
+                          dcaGroupId: group.id,
+                          name: event.target.value,
+                        });
+                      }}
+                    />
                     <span className="tag">{t('dca.members', { count: members })}</span>
                   </header>
                   <SliderField
@@ -187,13 +199,7 @@ export function RoutingView() {
                     >
                       S
                     </button>
-                    <Toggle
-                      label={`${t('dca.link')} ${group.name}`}
-                      checked={group.linked}
-                      onChange={(value) => {
-                        void dispatch({ type: 'dca.link', dcaGroupIds: [group.id], linked: value });
-                      }}
-                    />
+
                   </div>
                 </article>
               );
