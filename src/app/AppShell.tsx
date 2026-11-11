@@ -47,7 +47,10 @@ export function AppShell() {
   const [view, setView] = useState<ViewId>(() =>
     isViewId(snapshot.system.defaultPage) ? snapshot.system.defaultPage : 'mixer',
   );
-  const hasDevice = snapshot.strips.length > 0;
+  const hasDevice =
+    snapshot.mode === 'demo'
+      ? snapshot.strips.length > 0
+      : snapshot.connection === 'bridge-connected';
   const activeView: ViewId = hasDevice ? view : 'connection';
 
   return (
