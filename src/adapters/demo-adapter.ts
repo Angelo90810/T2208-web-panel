@@ -428,8 +428,18 @@ export class DemoAdapter implements MixerAdapter {
         if (!CONNECTION_STATES.includes(action.state)) {
           return { ok: false, simulated: true, code: 'invalid', message: 'Estado inválido.' };
         }
-        this.snapshot = { ...this.snapshot, demoConnection: action.state };
+        this.snapshot = { ...this.snapshot, connection: action.state };
         return { ok: true, simulated: true, code: 'applied' };
+      }
+
+      case 'bridge.connect':
+      case 'bridge.disconnect': {
+        return {
+          ok: false,
+          simulated: true,
+          code: 'not-supported',
+          message: 'A ponte local só existe no modo bridge.',
+        };
       }
 
       default:

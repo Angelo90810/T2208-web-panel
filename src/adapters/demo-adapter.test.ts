@@ -134,7 +134,7 @@ describe('DemoAdapter', () => {
   it('keeps the demo connection states simulated', async () => {
     const adapter = new DemoAdapter({ storage: memoryStorage() });
     await adapter.dispatch({ type: 'demo.setConnectionScenario', state: 'demo-connected' });
-    expect(adapter.getSnapshot().demoConnection).toBe('demo-connected');
-    expect(adapter.getSnapshot().demoConnection.startsWith('demo-')).toBe(true);
+    expect(adapter.getSnapshot().connection).toBe('demo-connected');
+    expect(adapter.getSnapshot().connection.startsWith('demo-')).toBe(true);
   });
 });

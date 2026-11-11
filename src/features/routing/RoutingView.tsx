@@ -34,7 +34,7 @@ export function RoutingView() {
     <section className="view routing-view">
       <header className="view-head">
         <div>
-          <span className="eyebrow">{t('common.simulated')}</span>
+          <span className="eyebrow">{snapshot.mode === 'bridge' ? t('bridge.eyebrow') : t('common.simulated')}</span>
           <h1>{t('routing.title')}</h1>
           <p>{t('routing.subtitle')}</p>
         </div>

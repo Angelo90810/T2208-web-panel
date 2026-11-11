@@ -69,6 +69,12 @@
   gap: 6px;
 }
 
+.connection-side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .protocol-note {
   display: flex;
   gap: 10px;

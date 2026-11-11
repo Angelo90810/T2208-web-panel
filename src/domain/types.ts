@@ -9,6 +9,16 @@ export type DemoConnectionState =
   | 'demo-firmware-model-mismatch'
   | 'demo-bridge-unavailable';
 
+export type BridgeConnectionState =
+  | 'bridge-idle'
+  | 'bridge-connecting'
+  | 'bridge-connected'
+  | 'bridge-disconnected'
+  | 'bridge-unavailable'
+  | 'bridge-firmware-mismatch';
+
+export type ConnectionState = DemoConnectionState | BridgeConnectionState;
+
 export type Language = 'pt-BR' | 'en' | 'zh-CN';
 
 export interface DeviceCapabilities {
@@ -130,9 +140,21 @@ export interface SystemSettings {
   firmware: string;
 }
 
+export interface BridgeInfo {
+  url: string;
+  deviceHost: string | null;
+  devicePort: number;
+  connected: boolean;
+  version: string | null;
+  deviceName: string | null;
+  dryRun: boolean;
+  allowRealWrites: boolean;
+  lastError: string | null;
+}
+
 export interface MixerSnapshot {
-  mode: 'demo';
-  demoConnection: DemoConnectionState;
+  mode: 'demo' | 'bridge';
+  connection: ConnectionState;
   capabilities: DeviceCapabilities;
   strips: ChannelState[];
   buses: BusState[];
@@ -142,13 +164,15 @@ export interface MixerSnapshot {
   system: SystemSettings;
   outputMatrix: Record<string, boolean>;
   selectedStripId: string;
+  bridge?: BridgeInfo;
 }
 
 export interface DispatchResult {
   ok: boolean;
-  simulated: true;
+  simulated: boolean;
   code: 'applied' | 'invalid' | 'not-supported';
   message?: string;
+  confirmed?: boolean;
 }
 
 export type StripControl =
@@ -222,7 +246,9 @@ export type MixerAction =
   | { type: 'scene.recall'; sceneId: string }
   | { type: 'system.set'; setting: SystemSetting; value: string | number }
   | { type: 'system.resetDefaults'; scope: 'all' | 'system' }
-  | { type: 'demo.setConnectionScenario'; state: DemoConnectionState };
+  | { type: 'demo.setConnectionScenario'; state: DemoConnectionState }
+  | { type: 'bridge.connect'; host: string; port?: number }
+  | { type: 'bridge.disconnect' };
 
 export interface StorageLike {
   getItem(key: string): string | null;

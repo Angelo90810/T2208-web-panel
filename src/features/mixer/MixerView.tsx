@@ -37,7 +37,7 @@ export function MixerView() {
     <section className="view mixer-view">
       <header className="view-head">
         <div>
-          <span className="eyebrow">{t('common.simulated')}</span>
+          <span className="eyebrow">{snapshot.mode === 'bridge' ? t('bridge.eyebrow') : t('common.simulated')}</span>
           <h1>{t('mixer.title')}</h1>
           <p>{t('mixer.subtitle')}</p>
         </div>

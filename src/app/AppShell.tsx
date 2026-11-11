@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ConnectionStatus } from '../components/ConnectionStatus';
+import { BridgeBanner } from '../components/BridgeBanner';
 import { DemoBanner } from '../components/DemoBanner';
 import { Icon } from '../components/Icon';
 import { AutoMixView } from '../features/automix/AutoMixView';
@@ -85,7 +86,7 @@ export function AppShell() {
         </div>
       </header>
 
-      <DemoBanner />
+      {snapshot.mode === 'demo' ? <DemoBanner /> : <BridgeBanner />}
 
       <div className="app-body">
         <nav className="app-nav" aria-label={t('app.subtitle')}>

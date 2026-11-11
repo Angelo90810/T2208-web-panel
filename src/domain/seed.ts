@@ -199,7 +199,7 @@ export function buildSeedSnapshot(capabilities: DeviceCapabilities = DEFAULT_CAP
 
   return {
     mode: 'demo',
-    demoConnection: 'demo-idle',
+    connection: 'demo-idle',
     capabilities: { ...capabilities },
     strips,
     buses,

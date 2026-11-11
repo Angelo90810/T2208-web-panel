@@ -19,7 +19,7 @@ export function AutoMixView() {
     <section className="view automix-view">
       <header className="view-head">
         <div>
-          <span className="eyebrow">{t('common.simulated')}</span>
+          <span className="eyebrow">{snapshot.mode === 'bridge' ? t('bridge.eyebrow') : t('common.simulated')}</span>
           <h1>{t('automix.title')}</h1>
           <p>{t('automix.subtitle')}</p>
         </div>
