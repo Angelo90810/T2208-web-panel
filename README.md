@@ -32,7 +32,14 @@ O painel tem um único modo de produção: **ponte local**. A URL pode vir de `?
 ## Rodando
 
 ```bash
+git clone https://github.com/Angelo90810/T2208-web-panel.git
+cd T2208-web-panel
 npm install
+```
+
+Ou baixe o ZIP em **Code → Download ZIP** no GitHub.
+
+```bash
 npm run dev          # sobe a ponte + Vite em http://127.0.0.1:5173
 npm run dev:web      # só o Vite, se a ponte já estiver rodando
 npm run test:run     # 29 testes
