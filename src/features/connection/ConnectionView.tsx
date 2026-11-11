@@ -46,6 +46,8 @@ export function ConnectionView() {
   const [discovering, setDiscovering] = useState(false);
   const [discoveryError, setDiscoveryError] = useState('');
   const [devices, setDevices] = useState<BridgeDevice[]>([]);
+  const [hostDraft, setHostDraft] = useState(snapshot.bridge?.deviceHost ?? '');
+  const [hostError, setHostError] = useState('');
   const timers = useRef<number[]>([]);
 
   useEffect(
@@ -130,6 +132,27 @@ export function ConnectionView() {
   const disconnectBridge = () => {
     void dispatch({ type: 'bridge.disconnect' });
   };
+
+  const connectManual = () => {
+    const host = hostDraft.trim();
+    if (!isValidIpv4(host) && !/^[a-z0-9][a-z0-9.-]*$/i.test(host)) {
+      setHostError(t('bridge.invalidHost'));
+      return;
+    }
+    setHostError('');
+    void connectBridge(host);
+  };
+
+  const autoConnected = useRef(false);
+  useEffect(() => {
+    if (autoConnected.current) return;
+    const host = new URLSearchParams(window.location.search).get('device');
+    if (!host) return;
+    autoConnected.current = true;
+    void connectBridge(host);
+    // The URL parameter is a one-shot instruction.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const connected = snapshot.connection === 'demo-connected';
   const bridge = snapshot.bridge;
@@ -227,6 +250,30 @@ export function ConnectionView() {
                   </article>
                 ))}
               </div>
+            </div>
+
+            <div className="scenario-block">
+              <h3>{t('bridge.manualConnect')}</h3>
+              <div className="manual-connect">
+                <label className="text-field">
+                  <span>{t('bridge.manualHost')}</span>
+                  <input
+                    value={hostDraft}
+                    placeholder="192.168.1.50"
+                    onChange={(event) => {
+                      setHostDraft(event.target.value);
+                      setHostError('');
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') connectManual();
+                    }}
+                  />
+                </label>
+                <button type="button" className="btn btn-primary" onClick={connectManual}>
+                  {t('bridge.connectDevice')}
+                </button>
+              </div>
+              {hostError && <small className="field-error">{hostError}</small>}
             </div>
           </article>
         ) : (

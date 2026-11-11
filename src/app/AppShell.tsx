@@ -125,7 +125,9 @@ export function AppShell() {
             <span>
               {snapshot.bridge?.deviceHost
                 ? `${t('bridge.deviceHost')}: ${snapshot.bridge.deviceHost}`
-                : t('bridge.notConfigured')}
+                : snapshot.connection === 'bridge-unavailable'
+                  ? t('bridge.offline')
+                  : t('bridge.waiting')}
             </span>
           </>
         )}

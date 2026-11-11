@@ -33,7 +33,8 @@ O painel tem um único modo de produção: **ponte local**. A URL pode vir de `?
 
 ```bash
 npm install
-npm run dev          # http://127.0.0.1:5173
+npm run dev          # sobe a ponte + Vite em http://127.0.0.1:5173
+npm run dev:web      # só o Vite, se a ponte já estiver rodando
 npm run test:run     # 29 testes
 npm run typecheck
 npm run typecheck:bridge
@@ -57,6 +58,12 @@ npm run bridge -- --device 192.168.1.50
 ```
 
 A descoberta também pode ser feita pela tela **Conexão → Ponte local → Procurar mesa**. Enquanto os payloads não forem validados, a ponte permanece somente leitura.
+
+Se a descoberta não achar a mesa, use **Conexão → Ponte local → Conectar por IP** ou abra direto com o IP:
+
+```text
+http://127.0.0.1:5173/?bridge=ws://127.0.0.1:8787/ws&device=192.168.1.50
+```
 
 ## Estrutura
 

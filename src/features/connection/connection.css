@@ -63,6 +63,21 @@
   text-transform: uppercase;
 }
 
+.manual-connect {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.manual-connect .text-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.manual-connect .btn {
+  white-space: nowrap;
+}
+
 .scenario-buttons {
   display: flex;
   flex-wrap: wrap;
