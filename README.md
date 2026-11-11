@@ -1,8 +1,8 @@
 # T2208 Web Panel
 
-Painel web responsivo para o mixer **T2208**, construído a partir da análise estática do APK Android e do aplicativo Windows oficiais. Esta primeira fase é **100% DEMO**: a interface inteira funciona, mas nenhum comando é enviado a uma mesa real.
+Painel web responsivo para o mixer **T2208**, construído a partir da análise estática do APK Android e do aplicativo Windows oficiais. A interface está completa em modo **DEMO**, e a **ponte local** já existe e roda contra um simulador — a validação com a mesa física continua pendente.
 
-![status](https://img.shields.io/badge/fase-DEMO-f6a623) ![stack](https://img.shields.io/badge/React-19-4cc9f0) ![testes](https://img.shields.io/badge/testes-18%20passando-34d399)
+![status](https://img.shields.io/badge/fase-DEMO-f6a623) ![bridge](https://img.shields.io/badge/ponte-dry--run-4cc9f0) ![testes](https://img.shields.io/badge/testes-27%20passando-34d399)
 
 ## O que já funciona
 
@@ -13,51 +13,84 @@ Painel web responsivo para o mixer **T2208**, construído a partir da análise e
 - **AutoMix** — ativação, participação por canal e limpeza com confirmação.
 - **Presets e cenas** — biblioteca local no navegador, salvar, carregar, copiar, excluir e recall com confirmação.
 - **Sistema** — identidade, idioma (pt-BR/en/zh-CN), brilho, página inicial, atalho, IP, restauração de padrões e placeholders de memória (Windows-only).
-- **Conexão** — estados simulados de descoberta e conexão, validação de IPv4 e explicação do protocolo observado.
+- **Conexão** — cenários demo e **modo ponte**: descoberta UDP real, TCP 5000, leitura de versão/nome e dry-run.
+- **Ponte local** — codec do quadro, mapa de comandos 1–55, descoberta HF-A11/IP120, cliente TCP, servidor HTTP/WS e simulador T2208.
 
-## Segurança e limites desta fase
+## Modos
 
-- Toda tela mantém o banner **DEMO** e o estado de conexão prefixado `demo-`.
-- Não há descoberta de rede, sockets UDP/TCP, bridge local, escrita de firmware ou comandos reais.
+| Modo | Como entrar | O que acontece |
+|---|---|---|
+| **DEMO** | padrão, sem parâmetro | estado simulado no navegador; banner DEMO |
+| **Ponte** | `?bridge=ws://127.0.0.1:8787/ws` ou Conexão → Usar ponte | painel usa o snapshot da ponte; banner PONTE LOCAL e dry-run |
+
+## Segurança e limites
+
+- No modo DEMO, toda tela mantém o banner **DEMO** e o estado `demo-*`; nenhum socket é aberto pelo navegador.
+- No modo ponte, o banner é **PONTE LOCAL — mesa não validada**; a ponte lê versão/nome e mantém **dry-run**.
+- A ponte ainda **não envia comandos de controle** (ganho, fader, 48V, routing etc.) porque os payloads não foram validados no hardware. `--allow-real-writes` é reservado e ignorado.
 - 48V/phantom power, reset, exclusão de preset, recall de cena e limpeza do AutoMix exigem confirmação explícita; cancelar não altera o estado.
-- O modelo de canais (`DeviceCapabilities`) é dirigido por dados: a interface se adapta a uma mesa com outra contagem de strips, Aux, FX ou DCA.
 - O perfil de 30 strips/6 DCA/48V nos 16 primeiros vem da análise estática e ainda **não foi validado em hardware**.
+- O APK e o EXE fornecidos não foram executados, instalados nem alterados.
 
 ## Rodando
 
 ```bash
 npm install
-npm run dev        # http://127.0.0.1:5173
-npm run test:run   # 18 testes
+npm run dev          # http://127.0.0.1:5173
+npm run test:run     # 27 testes
 npm run typecheck
-npm run build      # gera dist/
+npm run typecheck:bridge
+npm run build        # gera dist/
 ```
+
+### Ponte com simulador (sem mesa)
+
+```bash
+npm run bridge:sim
+# em outro terminal, abra:
+# http://127.0.0.1:5173/?bridge=ws://127.0.0.1:8787/ws
+```
+
+A ponte sobe TCP 5000, UDP 48899/8000 e o simulador; o painel mostra versão `V1.1` e nome `T2208-SIM`. Mais detalhes em [`bridge/README.md`](bridge/README.md).
+
+### Ponte contra a mesa (quando houver acesso)
+
+```bash
+npm run bridge -- --device 192.168.1.50
+```
+
+A descoberta também pode ser feita pela tela **Conexão → Ponte local → Procurar mesa**. Enquanto os payloads não forem validados, a ponte permanece somente leitura.
 
 ## Estrutura
 
 ```
 src/
-  adapters/       contrato MixerAdapter + DemoAdapter persistido em localStorage
-  app/            provider, i18n, navegação e shell responsivo
+  adapters/       MixerAdapter, DemoAdapter e BridgeAdapter
+  app/            provider, i18n, navegação, shell e seleção de modo
   components/     controles e feedback reutilizáveis
   domain/         tipos, capacidades, constantes e seed do perfil demo
   features/       uma pasta por tela (mixer, meters, processing, routing, ...)
   i18n/           catálogo pt-BR/en/zh-CN
   styles/         tokens e CSS global
+bridge/
+  protocol/       quadro, comandos e descoberta UDP
+  device/         cliente TCP 5000 e simulador T2208
+  engine.ts       estado, conexão e status da ponte
+  server.ts       HTTP + WebSocket
+  index.ts        CLI (bridge / bridge:sim)
 docs/
   research/       análise do protocolo e dos artefatos
-  specs/          spec aprovado
+  specs/          specs das fases 1 e 2
   plans/          plano de implementação
 ```
 
 ## Próxima fase
 
-Quando houver uma mesa e o protocolo validado em campo, entra uma **ponte local** na mesma rede do T2208: o navegador fala com a ponte, e a ponte fala TCP 5000/UDP 48899 com a mesa. O `MixerAdapter` já isola essa troca; a implementação real não precisa mexer nas telas.
+Com a mesa no local: validar o handshake, a resposta de versão, os ACKs e a codificação de cada payload; depois implementar as escritas de controle na ponte, uma família de comandos por vez, com teste de regressão. A camada de UI já está isolada pelo `MixerAdapter` e não precisa mudar.
 
 ## Referências
 
 - `docs/research/2026-11-09-t2208-protocol-analysis.md` — portas, quadro, mapa de comandos e modelo de canais recuperados estaticamente.
-- `docs/specs/2026-10-17-t2208-web-panel-design.md` — decisões de produto e escopo.
-- `docs/plans/2026-10-17-t2208-web-panel.md` — plano de implementação.
-
-> Nenhum APK ou EXE foi executado, instalado ou modificado durante a análise.
+- `docs/specs/2026-10-17-t2208-web-panel-design.md` — decisões de produto e escopo da fase 1.
+- `docs/specs/2026-11-10-local-bridge-phase.md` — escopo e status da ponte local.
+- `bridge/README.md` — API, execução e limites da ponte.
