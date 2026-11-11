@@ -65,6 +65,16 @@ Se a descoberta não achar a mesa, use **Conexão → Ponte local → Conectar p
 http://127.0.0.1:5173/?bridge=ws://127.0.0.1:8787/ws&device=192.168.1.50
 ```
 
+## PC da igreja (Windows)
+
+1. Instale o **Node.js LTS** uma vez: <https://nodejs.org/>.
+2. Copie a pasta do projeto para o PC (ex.: `C:\T2208\`).
+3. Dê dois cliques em **`start-panel.cmd`**. Ele instala as dependências na primeira vez, sobe a ponte + o painel e abre o navegador.
+4. Na tela **Conexão**, use **Procurar mesa** ou **Conectar por IP** com o IP do T2208.
+5. Para usar em tablet/celular na mesma rede, abra `http://IP_DO_PC:5173/` e permita o Node.js no firewall do Windows.
+
+O painel não tem login; use somente na rede local da igreja, nunca exposto na internet. A janela **“T2208 - Ponte”** precisa ficar aberta; feche-a para encerrar.
+
 ## Estrutura
 
 ```

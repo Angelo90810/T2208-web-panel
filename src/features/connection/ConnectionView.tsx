@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useMixer } from '../../app/MixerProvider';
 import { useI18n } from '../../app/useI18n';
 import { Icon } from '../../components/Icon';
-import { BRIDGE_URL_STORAGE_KEY, DEFAULT_BRIDGE_URL } from '../../domain/constants';
+import { BRIDGE_URL_STORAGE_KEY, defaultBridgeUrl } from '../../domain/constants';
 import type { DemoConnectionState } from '../../domain/types';
 import './connection.css';
 
@@ -41,7 +41,7 @@ export function ConnectionView() {
   const [found, setFound] = useState(false);
   const [ipDraft, setIpDraft] = useState(snapshot.system.ip);
   const [ipError, setIpError] = useState(false);
-  const [bridgeUrl, setBridgeUrl] = useState(snapshot.bridge?.url || DEFAULT_BRIDGE_URL);
+  const [bridgeUrl, setBridgeUrl] = useState(snapshot.bridge?.url || defaultBridgeUrl());
   const [bridgeError, setBridgeError] = useState('');
   const [discovering, setDiscovering] = useState(false);
   const [discoveryError, setDiscoveryError] = useState('');

@@ -4,6 +4,15 @@ export const LIBRARY_STORAGE_KEY = 't2208-demo-library-v1';
 export const BRIDGE_URL_STORAGE_KEY = 't2208-bridge-url';
 export const DEFAULT_BRIDGE_URL = 'ws://127.0.0.1:8787/ws';
 
+export function defaultBridgeUrl(): string {
+  if (typeof window === 'undefined') return DEFAULT_BRIDGE_URL;
+  const host = window.location.hostname;
+  if (!host || host === 'localhost' || host === '127.0.0.1' || host === '::1') {
+    return DEFAULT_BRIDGE_URL;
+  }
+  return `ws://${host}:8787/ws`;
+}
+
 export const DEFAULT_CAPABILITIES: DeviceCapabilities = {
   stripCount: 30,
   inputChannelCount: 20,

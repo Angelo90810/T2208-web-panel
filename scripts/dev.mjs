@@ -4,6 +4,8 @@ import path from 'node:path';
 const root = process.cwd();
 const children = [];
 let shuttingDown = false;
+const lan = process.argv.includes('--lan');
+const viteArgs = process.argv.slice(2).filter((arg) => arg !== '--lan');
 
 function start(command, args, name) {
   const child = spawn(command, args, { cwd: root, stdio: 'inherit' });
@@ -52,17 +54,23 @@ process.on('SIGTERM', () => shutdown(0));
 
 if (await bridgeIsUp()) {
   console.log('[dev] ponte já está rodando em 127.0.0.1:8787');
+  if (lan) {
+    console.warn('[dev] a ponte existente pode estar em 127.0.0.1; para tablet/celular, feche-a e suba com --lan.');
+  }
 } else {
   console.log('[dev] subindo ponte local...');
-  start(process.execPath, [path.join(root, 'node_modules/tsx/dist/cli.mjs'), 'bridge/index.ts'], 'ponte');
+  const bridgeArgs = [path.join(root, 'node_modules/tsx/dist/cli.mjs'), 'bridge/index.ts'];
+  if (lan) bridgeArgs.push('--host', '0.0.0.0');
+  start(process.execPath, bridgeArgs, 'ponte');
   const ready = await waitForBridge();
   if (!ready) console.warn('[dev] a ponte não respondeu em 10 s; o painel vai abrir offline.');
 }
 
 console.log('[dev] subindo Vite...');
+if (lan && !viteArgs.includes('--host')) viteArgs.push('--host', '0.0.0.0');
 start(
   process.execPath,
-  [path.join(root, 'node_modules/vite/bin/vite.js'), ...process.argv.slice(2)],
+  [path.join(root, 'node_modules/vite/bin/vite.js'), ...viteArgs],
   'vite',
 );
 
