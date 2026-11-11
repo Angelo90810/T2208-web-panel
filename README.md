@@ -92,5 +92,5 @@ Com a mesa no local: validar o handshake, a resposta de versão, os ACKs e a cod
 
 - `docs/research/2026-11-09-t2208-protocol-analysis.md` — portas, quadro, mapa de comandos e modelo de canais recuperados estaticamente.
 - `docs/specs/2026-10-17-t2208-web-panel-design.md` — decisões de produto e escopo da fase 1.
-- `docs/specs/2026-11-09-local-bridge-phase.md` — escopo e status da ponte local.
+- `docs/specs/2026-11-11-local-bridge-phase.md` — escopo e status da ponte local.
 - `bridge/README.md` — API, execução e limites da ponte.

@@ -111,4 +111,4 @@ Phase 1 (DEMO) was implemented on 2026-11-09 in commits `bc0a885` (`feat: build 
 
 Real hardware control, discovery, and the local bridge remain pending; they require a physical T2208 and firmware/protocol validation, as described in §6 and §9.
 
-The local-bridge phase was implemented on 2026-11-09 without hardware: frame codec, command map, UDP discovery, TCP 5000 client, HTTP/WebSocket bridge, T2208 simulator, browser `BridgeAdapter`, and a dry-run mode switch. Safe probes (version, device name, keepalive) run against the simulator; control writes remain disabled until payloads are validated on the physical mixer. See `docs/specs/2026-11-09-local-bridge-phase.md`.
+The local-bridge phase was implemented on 2026-11-11 without hardware: frame codec, command map, UDP discovery, TCP 5000 client, HTTP/WebSocket bridge, T2208 simulator, browser `BridgeAdapter`, and a dry-run mode switch. Safe probes (version, device name, keepalive) run against the simulator; control writes remain disabled until payloads are validated on the physical mixer. See `docs/specs/2026-11-11-local-bridge-phase.md`.

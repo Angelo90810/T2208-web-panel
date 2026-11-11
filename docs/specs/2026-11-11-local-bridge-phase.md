@@ -1,6 +1,6 @@
 # T2208 Local Bridge — Phase 2 Spec
 
-- **Status:** implemented on 2026-11-09 without physical hardware; hardware validation pending.
+- **Status:** implemented on 2026-11-11 without physical hardware; hardware validation pending.
 - **Project:** `C:\Users\Angelo\Projects\T2208-web-panel`
 - **Depends on:** `docs/research/2026-11-09-t2208-protocol-analysis.md` and `docs/specs/2026-10-17-t2208-web-panel-design.md`.
 - **Scope:** everything that can be built and tested without the mixer: protocol codec, discovery, TCP client, local bridge, simulator, browser adapter and mode switch.
