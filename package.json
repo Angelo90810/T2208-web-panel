@@ -12,6 +12,7 @@
     "verify": "npm run typecheck && npm run typecheck:bridge && npm run test:run && npm run build",
     "bridge": "tsx bridge/index.ts",
     "bridge:sim": "tsx bridge/index.ts --simulate",
+    "probe": "tsx bridge/probe.ts",
     "test": "vitest",
     "test:run": "vitest run",
     "preview": "vite preview"

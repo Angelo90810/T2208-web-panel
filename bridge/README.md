@@ -44,6 +44,16 @@ npm run bridge -- --device 192.168.1.50
 
 Ou descubra pela interface **Conexão → Ponte local → Procurar mesa**. A ponte conecta em TCP 5000, lê versão/nome e mantém o modo **dry-run**: nenhum comando de controle é enviado enquanto os payloads não forem validados no hardware.
 
+### Sondar sem subir a ponte
+
+```bash
+npm run probe -- --host 192.168.1.50
+npm run probe -- --discover
+npm run probe -- --discover --target 127.0.0.1   # simulador local
+```
+
+O probe só envia versão, nome e keepalive; não escreve nada na mesa.
+
 Para acessar de outro dispositivo da rede, suba a ponte e o Vite com `--host 0.0.0.0` e use o IP do PC no lugar de `127.0.0.1`:
 
 ```
